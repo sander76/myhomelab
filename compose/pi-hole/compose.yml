@@ -3,6 +3,8 @@ services:
   pihole:
     container_name: pihole
     image: pihole/pihole:latest
+    secrets:
+      - pihole_webpasswd
     ports:
       # DNS Ports
       - "53:53/tcp"
@@ -18,8 +20,7 @@ services:
     environment:
       # Set the appropriate timezone for your location (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones), e.g:
       TZ: 'Europe/Amsterdam'
-      # Set a password to access the web interface. Not setting one will result in a random password being assigned
-      FTLCONF_webserver_api_password: 'correct horse battery staple'
+      WEBPASSWORD_FILE: pihole_webpasswd
       # If using Docker's default `bridge` network setting the dns listening mode should be set to 'ALL'
       FTLCONF_dns_listeningMode: 'ALL'
     # Volumes store your data between container upgrades
@@ -37,3 +38,7 @@ services:
       # Optional, if Pi-hole should get some more processing time
       - SYS_NICE
     restart: unless-stopped
+
+secrets:
+  pihole_webpasswd:
+    file: ${SECRETS}/pi-hole.txt
