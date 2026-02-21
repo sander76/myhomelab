@@ -1,5 +1,5 @@
 # Pi-hole admin interface
-panterlab.friz.box {
+panterlab.fritz.box {
     tls internal
 
     handle_path /pihole/* {
