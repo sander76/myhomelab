@@ -1,0 +1,25 @@
+# Caddy reverse proxy - https://caddyserver.com/docs/
+services:
+  caddy:
+    container_name: caddy
+    image: caddy:latest
+    ports:
+      # HTTP (redirects to HTTPS)
+      - '80:80/tcp'
+      # HTTPS
+      - '443:443/tcp'
+    environment:
+      TZ: 'Europe/Amsterdam'
+    volumes:
+      # Caddyfile configuration
+      - ${MYHOMELAB}/compose/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      # Persistent data (certificates, etc.)
+      - ${MYHOMELAB}/data/caddy/data:/data
+      - ${MYHOMELAB}/data/caddy/config:/config
+    networks:
+      - proxy
+    restart: unless-stopped
+
+networks:
+  proxy:
+    name: proxy

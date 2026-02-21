@@ -1,2 +1,3 @@
 include:
+  - compose/caddy/compose.yml
   - compose/pi-hole/compose.yml

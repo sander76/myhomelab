@@ -1,0 +1,5 @@
+# Pi-hole admin interface
+pihole.home {
+    tls internal
+    reverse_proxy pihole:80
+}
