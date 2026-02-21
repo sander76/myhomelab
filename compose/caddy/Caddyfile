@@ -1,9 +1,6 @@
 
-panterlab.fritz.box, 192.168.188.188 {
+pihole.fritz.box {
 	tls internal
-	handle_path /pihole/* {
-		reverse_proxy pihole:80
-		uri strip_prefix /pihole
-	}
+	reverse_proxy pihole:80
 	
 }
