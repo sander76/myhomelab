@@ -19,7 +19,3 @@ services:
     networks:
       - proxy
     restart: unless-stopped
-
-networks:
-  proxy:
-    external: true

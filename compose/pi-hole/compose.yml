@@ -40,7 +40,3 @@ services:
 secrets:
   pihole_webpasswd:
     file: ${SECRETS}/pi-hole.txt
-
-networks:
-  proxy:
-    external: true
