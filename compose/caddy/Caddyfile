@@ -1,13 +1,9 @@
 
-# Pi-hole admin interface
-panterlab.fritz.box {
-    tls internal
-    reverse_proxy pihole:80
-    redir /pihole /admin
-}
-
-192.168.188.188 {
-    tls internal
-    reverse_proxy pihole:80
-    redir /pihole /admin
+panterlab.fritz.box, 192.168.188.188 {
+	tls internal
+	handle_path /pihole/* {
+		reverse_proxy pihole:80
+		uri strip_prefix /pihole
+	}
+	
 }
