@@ -16,7 +16,6 @@ $SUDO apt update && $SUDO apt upgrade -y
 $SUDO apt install -y curl
 curl https://mise.run/bash | sh
 
-
 # Add mise to PATH only for this session
 export PATH="$HOME/.local/bin:$PATH"
 
@@ -29,3 +28,10 @@ mkdir -p "$HOME/.config/mise"
 ln -sf "$SCRIPT_DIR/mise_config.toml" "$HOME/.config/mise/config.toml"
 mise trust "$HOME/.config/mise/config.toml"
 mise install
+
+
+git config --global credential.helper cache
+git config --global credential.helper 'cache --timeout=720000'
+
+git config --global user.email "s.teunissen@gmail.com"
+git config --global user.name "Sander Teunissen"
