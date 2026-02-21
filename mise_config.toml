@@ -3,4 +3,5 @@ NODE_ENV = 'production'
 
 [tools]
 "aqua:micro-editor/micro" = "latest"
+bat = "latest"
 btop = "latest"
