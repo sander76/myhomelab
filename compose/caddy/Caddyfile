@@ -1,5 +1,8 @@
 # Pi-hole admin interface
-pihole.home {
+panterlab.friz.box {
     tls internal
-    reverse_proxy pihole:80
+
+    handle_path /pihole/* {
+        reverse_proxy pihole:80
+    }
 }
