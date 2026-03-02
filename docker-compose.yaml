@@ -1,2 +1,3 @@
 include:
   - compose/pi-hole/compose.yml
+  - compose/immich/compose.yml
