@@ -23,3 +23,10 @@ disable password login
 
 /etc/ssh/sshd_config
 PasswordAuthentication no
+
+
+## docker compose
+
+docker compose pull
+docker compose up -d
+docker compose logs -f
