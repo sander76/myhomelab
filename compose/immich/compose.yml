@@ -14,6 +14,14 @@ services:
       - ${MYHOMELAB}/data/immich/ts-config:/config
       - ${MYHOMELAB}/data/immich/ts-state:/var/lib/tailscale
     restart: unless-stopped
+    cap_add:
+      - net_admin  # Tailscale requirement
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:41234/healthz"] # Check Tailscale has a Tailnet IP and is operational
+      interval: 1m # How often to perform the check
+      timeout: 10s # Time to wait for the check to succeed
+      retries: 3 # Number of retries before marking as unhealthy
+      start_period: 10s # Time to wait before starting health checks
   application:
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
     network_mode: service:immich-ts # Sidecar configuration to route ${SERVICE} through Tailscale
