@@ -34,7 +34,7 @@ services:
         condition: service_healthy
       database:
         condition: service_healthy
-      tailscale:
+      immich-ts:
         condition: service_healthy
     restart: always
     healthcheck:
