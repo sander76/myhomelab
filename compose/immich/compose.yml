@@ -12,8 +12,11 @@ services:
     image: tailscale/tailscale:latest # Image to be used
     container_name: tailscale-${SERVICE} # Name for local container management
     hostname: ${SERVICE} # Name used within your Tailscale environment
+    secrets:
+      - immich_tailnet_token
     environment:
-      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_AUTHKEY=immich_tailnet_token
+      # - TS_AUTHKEY=${TS_AUTHKEY}
       - TS_STATE_DIR=/var/lib/tailscale
       - TS_SERVE_CONFIG=/config/serve.json # Tailscale Serve configuration to expose the web interface on your local Tailnet - remove this line if not required
       - TS_USERSPACE=false
@@ -25,8 +28,8 @@ services:
       - source: ts-serve
         target: /config/serve.json
     volumes:
-      - ./data/immich/ts-config:/config # Config folder used to store Tailscale files - you may need to change the path
-      - ./data/immich/ts-state:/var/lib/tailscale # Tailscale requirement - you may need to change the path
+      - ${MYHOMELAB}/data/immich/ts-config:/config # Config folder used to store Tailscale files - you may need to change the path
+      - ${MYHOMELAB}/data/immich/ts-state:/var/lib/tailscale # Tailscale requirement - you may need to change the path
     devices:
       - /dev/net/tun:/dev/net/tun # Network configuration for Tailscale to work
     cap_add:
@@ -52,8 +55,7 @@ services:
     #   file: hwaccel.transcoding.yml
     #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
     volumes:
-      # Do not edit the next line. If you want to change the media storage location on your system, edit the value of UPLOAD_LOCATION in the .env file
-      - ./${SERVICE}-data/upload:/usr/src/app/upload
+      - ${MYHOMELAB}/data/photos/upload:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
     env_file:
       - .env
@@ -79,7 +81,7 @@ services:
     #   file: hwaccel.ml.yml
     #   service: cpu # set to one of [armnn, cuda, rocm, openvino, openvino-wsl, rknn] for accelerated inference - use the `-wsl` version for WSL2 where applicable
     volumes:
-      - ./${SERVICE}-data/model-cache:/cache
+      - ${MYHOMELAB}/data/immich/model-cache:/cache
     env_file:
       - .env
     restart: always
@@ -105,7 +107,7 @@ services:
       # DB_STORAGE_TYPE: 'HDD'
     volumes:
       # Do not edit the next line. If you want to change the database storage location on your system, edit the value of DB_DATA_LOCATION in the .env file
-      - ./${SERVICE}-data/database:/var/lib/postgresql/data
+      - ${MYHOMELAB}/data/immich/database:/var/lib/postgresql/data
     restart: always
 secrets:
   immich_tailnet_token:

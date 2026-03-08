@@ -5,5 +5,6 @@ NODE_ENV = 'production'
 "aqua:micro-editor/micro" = "latest"
 bat = "latest"
 btop = "latest"
+"github:neurocyte/flow" = "latest"
 lazydocker = "latest"
 lazygit = "latest"
