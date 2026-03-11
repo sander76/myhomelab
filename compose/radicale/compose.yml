@@ -51,9 +51,6 @@ services:
     container_name: radicale
     image: ghcr.io/kozea/radicale:stable
     network_mode: service:tailscale # Sidecar configuration to route ${SERVICE} through Tailscale
-    ports:
-      # Web interface and CalDAV/CardDAV
-      - '5232:5232/tcp'
     environment:
       TZ: 'Europe/Amsterdam'
     volumes:
