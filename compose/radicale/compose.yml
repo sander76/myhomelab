@@ -1,0 +1,16 @@
+# Radicale CalDAV/CardDAV server - https://radicale.org/
+services:
+  radicale:
+    container_name: radicale
+    image: ghcr.io/kozea/radicale:stable
+    ports:
+      # Web interface and CalDAV/CardDAV
+      - '5232:5232/tcp'
+    environment:
+      TZ: 'Europe/Amsterdam'
+    volumes:
+      # Configuration files
+      - ${MYHOMELAB}/data/radicale/config:/etc/radicale
+      # Calendar and contact data
+      - ${MYHOMELAB}/data/radicale/data:/var/lib/radicale
+    restart: unless-stopped
