@@ -1,6 +1,6 @@
 # Radicale CalDAV/CardDAV server - https://radicale.org/
 configs:
-  ts-serve:
+  ts-serve-radicale:
     content: |
       {"TCP":{"443":{"HTTPS":true}},
       "Web":{"$${TS_CERT_DOMAIN}:443":
@@ -10,7 +10,7 @@ configs:
 
 
 services:
-  tailscale:
+  tailscale-radicale:
     image: tailscale/tailscale:latest # Image to be used
     container_name: tailscale-radicale # Name for local container management
     hostname: radicale # Name used within your Tailscale environment
@@ -25,7 +25,7 @@ services:
       - TS_LOCAL_ADDR_PORT=127.0.0.1:41234       # The <addr>:<port> for the healthz endpoint
       - TS_AUTH_ONCE=true
     configs:
-      - source: ts-serve
+      - source: ts-serve-radicale
         target: /config/serve.json
     volumes:
       - ${MYHOMELAB}/data/radicale/ts-config:/config # Config folder used to store Tailscale files - you may need to change the path
@@ -50,7 +50,7 @@ services:
   radicale:
     container_name: radicale
     image: ghcr.io/kozea/radicale:stable
-    network_mode: service:tailscale # Sidecar configuration to route ${SERVICE} through Tailscale
+    network_mode: service:tailscale-radicale # Sidecar configuration to route radicale through Tailscale
     environment:
       TZ: 'Europe/Amsterdam'
     volumes:
@@ -60,7 +60,7 @@ services:
       - ${MYHOMELAB}/data/radicale/data:/var/lib/radicale
 
     depends_on:
-      tailscale:
+      tailscale-radicale:
         condition: service_healthy
     restart: unless-stopped
 
