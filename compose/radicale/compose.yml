@@ -58,6 +58,10 @@ services:
       - ${MYHOMELAB}/data/radicale/config:/etc/radicale
       # Calendar and contact data
       - ${MYHOMELAB}/data/radicale/data:/var/lib/radicale
+
+    depends_on:
+      tailscale:
+        condition: service_healthy
     restart: unless-stopped
 
 secrets:
