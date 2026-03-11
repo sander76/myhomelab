@@ -1,8 +1,56 @@
 # Radicale CalDAV/CardDAV server - https://radicale.org/
+configs:
+  ts-serve:
+    content: |
+      {"TCP":{"443":{"HTTPS":true}},
+      "Web":{"$${TS_CERT_DOMAIN}:443":
+          {"Handlers":{"/":
+          {"Proxy":"http://127.0.0.1:2283"}}}},
+      "AllowFunnel":{"$${TS_CERT_DOMAIN}:443":false}}
+
+
 services:
+  tailscale:
+    image: tailscale/tailscale:latest # Image to be used
+    container_name: tailscale-radicale # Name for local container management
+    hostname: radicale # Name used within your Tailscale environment
+    secrets:
+      - radicale_tailnet_token
+    environment:
+      - TS_AUTHKEY=radicale_tailnet_token
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_SERVE_CONFIG=/config/serve.json # Tailscale Serve configuration to expose the web interface on your local Tailnet - remove this line if not required
+      - TS_USERSPACE=false
+      - TS_ENABLE_HEALTH_CHECK=true              # Enable healthcheck endpoint: "/healthz"
+      - TS_LOCAL_ADDR_PORT=127.0.0.1:41234       # The <addr>:<port> for the healthz endpoint
+      - TS_AUTH_ONCE=true
+    configs:
+      - source: ts-serve
+        target: /config/serve.json
+    volumes:
+      - ${MYHOMELAB}/data/radicale/ts-config:/config # Config folder used to store Tailscale files - you may need to change the path
+      - ${MYHOMELAB}/data/radicale/ts-state:/var/lib/tailscale # Tailscale requirement - you may need to change the path
+    devices:
+      - /dev/net/tun:/dev/net/tun # Network configuration for Tailscale to work
+    cap_add:
+      - net_admin # Tailscale requirement
+    #ports:
+    #  - 0.0.0.0:${SERVICEPORT}:${SERVICEPORT} # Binding port ${SERVICE}PORT to the local network - may be removed if only exposure to your Tailnet is required
+    # If any DNS issues arise, use your preferred DNS provider by uncommenting the config below
+    #dns: 
+    #  - ${DNS_SERVER}
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:41234/healthz"] # Check Tailscale has a Tailnet IP and is operational
+      interval: 1m # How often to perform the check
+      timeout: 10s # Time to wait for the check to succeed
+      retries: 3 # Number of retries before marking as unhealthy
+      start_period: 10s # Time to wait before starting health checks
+    restart: always
+
   radicale:
     container_name: radicale
     image: ghcr.io/kozea/radicale:stable
+    network_mode: service:tailscale # Sidecar configuration to route ${SERVICE} through Tailscale
     ports:
       # Web interface and CalDAV/CardDAV
       - '5232:5232/tcp'
@@ -14,3 +62,7 @@ services:
       # Calendar and contact data
       - ${MYHOMELAB}/data/radicale/data:/var/lib/radicale
     restart: unless-stopped
+
+secrets:
+  radicale_tailnet_token:
+    file: ${SECRETS}/radicale-tailnet-key.txt
