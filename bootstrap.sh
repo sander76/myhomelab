@@ -16,6 +16,8 @@ $SUDO apt update && $SUDO apt upgrade -y
 $SUDO apt install -y curl
 curl https://mise.run/bash | sh
 
+$SUDO apt install apache2-utils # for htpasswd util (used by radiale)
+
 # Add mise to PATH only for this session
 export PATH="$HOME/.local/bin:$PATH"
 
