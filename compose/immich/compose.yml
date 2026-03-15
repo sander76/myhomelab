@@ -8,15 +8,12 @@ configs:
       "AllowFunnel":{"$${TS_CERT_DOMAIN}:443":false}}
 
 services:
-  tailscale:
+  tailscale-immich:
     image: tailscale/tailscale:latest # Image to be used
     container_name: tailscale-${SERVICE} # Name for local container management
     hostname: ${SERVICE} # Name used within your Tailscale environment
-    secrets:
-      - immich_tailnet_token
     environment:
-      - TS_AUTHKEY=immich_tailnet_token
-      # - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_AUTHKEY=${TAILSCALE_AUTHKEY}
       - TS_STATE_DIR=/var/lib/tailscale
       - TS_SERVE_CONFIG=/config/serve.json # Tailscale Serve configuration to expose the web interface on your local Tailnet - remove this line if not required
       - TS_USERSPACE=false
@@ -28,8 +25,8 @@ services:
       - source: ts-serve
         target: /config/serve.json
     volumes:
-      - ${MYHOMELAB}/data/immich/ts-config:/config # Config folder used to store Tailscale files - you may need to change the path
-      - ${MYHOMELAB}/data/immich/ts-state:/var/lib/tailscale # Tailscale requirement - you may need to change the path
+      - ${MYHOMELAB}/tailscale/immich/ts-config:/config
+      - ${MYHOMELAB}/tailscale/immich/ts-state:/var/lib/tailscale
     devices:
       - /dev/net/tun:/dev/net/tun # Network configuration for Tailscale to work
     cap_add:
@@ -49,7 +46,7 @@ services:
 
   application:
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
-    network_mode: service:tailscale # Sidecar configuration to route ${SERVICE} through Tailscale
+    network_mode: service:tailscale-immich # Sidecar configuration to route ${SERVICE} through Tailscale
     container_name: app-${SERVICE}-server # Name for local container management
     # extends:
     #   file: hwaccel.transcoding.yml
@@ -66,7 +63,7 @@ services:
         condition: service_healthy
       database:
         condition: service_healthy
-      tailscale:
+      tailscale-immich:
         condition: service_healthy
     restart: always
     healthcheck:
@@ -109,6 +106,4 @@ services:
       # Do not edit the next line. If you want to change the database storage location on your system, edit the value of DB_DATA_LOCATION in the .env file
       - ${MYHOMELAB}/data/immich/database:/var/lib/postgresql/data
     restart: always
-secrets:
-  immich_tailnet_token:
-    file: ${SECRETS}/immich-tailnet-key.txt
+

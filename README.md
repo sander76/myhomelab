@@ -30,3 +30,8 @@ PasswordAuthentication no
 docker compose pull
 docker compose up -d
 docker compose logs -f
+
+## create a tailscale auth key
+
+make sure it creates a tag.
+do an `TAILSCALE_AUTHKEY=<the token>` and let tailscale use that token to authenticate. Node keys are stored in ts-state folder.
