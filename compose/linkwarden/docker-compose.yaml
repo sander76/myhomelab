@@ -1,0 +1,31 @@
+configs:
+  ts-serve:
+    content: |
+      {"TCP":{"443":{"HTTPS":true}},
+      "Web":{"$${TS_CERT_DOMAIN}:443":
+          {"Handlers":{"/":
+          {"Proxy":"http://127.0.0.1:3000"}}}},
+      "AllowFunnel":{"$${TS_CERT_DOMAIN}:443":false}}
+
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: always
+    volumes:
+      - ${MYHOMELAB}/data/linkwarden/database:/var/lib/postgresql/data 
+  linkwarden:
+    environment:
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
+    restart: always
+    image: ghcr.io/linkwarden/linkwarden:latest # comment to build from source
+    volumes:
+      - ${MYHOMELAB}/data/linkwarden/data:/data/data
+    depends_on:
+      - postgres
+      - meilisearch
+  meilisearch:
+    image: getmeili/meilisearch:v1.12.8
+    restart: always
+    volumes:
+      - ${MYHOMELAB}/data/linkwarden/meili_data:/meili_data

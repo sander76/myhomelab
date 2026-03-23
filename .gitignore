@@ -1,3 +1,4 @@
 data/
 **/ts-state/
 **/ts-config/
+**/.env
