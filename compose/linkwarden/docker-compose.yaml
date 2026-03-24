@@ -54,7 +54,7 @@ services:
     image: ghcr.io/linkwarden/linkwarden:latest # comment to build from source
     volumes:
       - ${MYHOMELAB}/data/linkwarden/data:/data/data
-    network_mode: service:tailscale-radicale # Sidecar configuration to route linkwarden through Tailscale
+    network_mode: service:tailscale # Sidecar configuration to route linkwarden through Tailscale
     depends_on:
       tailscale:
         condition: service_healthy
