@@ -7,13 +7,41 @@ configs:
           {"Proxy":"http://127.0.0.1:3000"}}}},
       "AllowFunnel":{"$${TS_CERT_DOMAIN}:443":false}}
 
-
 services:
+  tailscale:
+    image: tailscale/tailscale:latest # Image to be used
+    container_name: tailscale-linkwarden # Name for local container management
+    hostname: linkwarden # Name used within your Tailscale environment
+    environment:
+      - TS_AUTHKEY=${TAILSCALE_AUTHKEY}
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_SERVE_CONFIG=/config/serve.json # Tailscale Serve configuration to expose the web interface on your local Tailnet - remove this line if not required
+      - TS_USERSPACE=false
+      - TS_ENABLE_HEALTH_CHECK=true # Enable healthcheck endpoint: "/healthz"
+      - TS_LOCAL_ADDR_PORT=127.0.0.1:41234 # The <addr>:<port> for the healthz endpoint
+      - TS_AUTH_ONCE=true
+    configs:
+      - source: ts-serve
+        target: /config/serve.json
+    volumes:
+      - ${MYHOMELAB}/tailscale/linkwarden/ts-config:/config # Config folder used to store Tailscale files - you may need to change the path
+      - ${MYHOMELAB}/tailscale/linkwarden/ts-state:/var/lib/tailscale # Tailscale requirement - you may need to change the path
+    devices:
+      - /dev/net/tun:/dev/net/tun # Network configuration for Tailscale to work
+    cap_add:
+      - net_admin # Tailscale requirement
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:41234/healthz"] # Check Tailscale has a Tailnet IP and is operational
+      interval: 1m # How often to perform the check
+      timeout: 10s # Time to wait for the check to succeed
+      retries: 3 # Number of retries before marking as unhealthy
+      start_period: 10s # Time to wait before starting health checks
+    restart: always
   postgres:
     image: postgres:16-alpine
     restart: always
     volumes:
-      - ${MYHOMELAB}/data/linkwarden/database:/var/lib/postgresql/data 
+      - ${MYHOMELAB}/data/linkwarden/database:/var/lib/postgresql/data
   linkwarden:
     environment:
       - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
@@ -22,6 +50,8 @@ services:
     volumes:
       - ${MYHOMELAB}/data/linkwarden/data:/data/data
     depends_on:
+      - tailscale:
+          condition: service_healthy
       - postgres
       - meilisearch
   meilisearch:
