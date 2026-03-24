@@ -55,10 +55,12 @@ services:
     volumes:
       - ${MYHOMELAB}/data/linkwarden/data:/data/data
     depends_on:
-      - tailscale:
-          condition: service_healthy
-      - postgres
-      - meilisearch
+      tailscale:
+        condition: service_healthy
+      postgres:
+        condition: service_started
+      meilisearch:
+        condition: service_started
   meilisearch:
     image: getmeili/meilisearch:v1.12.8
     restart: always
