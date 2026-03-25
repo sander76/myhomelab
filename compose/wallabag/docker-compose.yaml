@@ -4,7 +4,7 @@ configs:
       {"TCP":{"443":{"HTTPS":true}},
       "Web":{"$${TS_CERT_DOMAIN}:443":
           {"Handlers":{"/":
-          {"Proxy":"http://127.0.0.1:8080"}}}},
+          {"Proxy":"http://127.0.0.1:80"}}}},
       "AllowFunnel":{"$${TS_CERT_DOMAIN}:443":false}}
 
 services:
@@ -42,9 +42,10 @@ services:
     restart: unless-stopped
     environment:
       - SYMFONY__ENV__DATABASE_DRIVER=pdo_sqlite
+      - SYMFONY__ENV__DOMAIN_NAME=https://wallabag.tail2f7349.ts.net
     volumes:
       - ${MYHOMELAB}/data/wallabag/data:/var/www/wallabag/data
-      - /opt/wallabag/images:/var/www/wallabag/web/assets/images
+      - ${MYHOMELAB}/data/wallabag/images:/var/www/wallabag/web/assets/images
     network_mode: service:tailscale # Sidecar configuration to route linkwarden through Tailscale
     depends_on:
       tailscale:
