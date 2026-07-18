@@ -1,0 +1,24 @@
+# Syncthing - continuous file synchronization
+# https://docs.syncthing.net/
+services:
+  syncthing:
+    container_name: syncthing
+    image: syncthing/syncthing:latest
+    hostname: syncthing
+    network_mode: host
+    environment:
+      TZ: 'Europe/Amsterdam'
+      # Unset GUI address to fall back to localhost-only default (127.0.0.1)
+      STGUIADDRESS: ''
+    volumes:
+      # Syncthing configuration
+      - ${MYHOMELAB}/data/syncthing/config:/var/syncthing/config
+      # Synced files folder
+      - ${MYHOMELAB}/data/syncthing/sync:/var/syncthing/sync
+    healthcheck:
+      test: curl -fkLsS -m 2 127.0.0.1:8384/rest/noauth/health | grep -o --color=never OK || exit 1
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped

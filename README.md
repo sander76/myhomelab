@@ -31,6 +31,7 @@ Each service has its own Docker Compose file under `compose/<service>/`:
 | Immich | `compose/immich/docker-compose.yaml` |
 | Linkwarden | `compose/linkwarden/docker-compose.yaml` |
 | Shiori | `compose/shiori/docker-compose.yaml` |
+| Syncthing | `compose/syncthing/docker-compose.yaml` |
 | Wallabag | `compose/wallabag/docker-compose.yaml` |
 
 Start a service:
