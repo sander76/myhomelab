@@ -11,10 +11,10 @@ code—only YAML configuration files for self-hosted services running via Docker
 
 ```
 /
-├── docker-compose.yaml     # Main entry point (includes service compose files)
 ├── compose/                # Service definitions (one directory per service)
 │   └── <service>/
-│       └── compose.yml     # Service-specific Docker Compose configuration
+│       └── docker-compose.yaml  # Service-specific Docker Compose configuration
+│       └── .env-template   # Optional environment variable template
 ├── data/                   # Persistent data volumes (gitignored)
 │   └── <service>/
 │       └── .gitkeep        # Preserves directory structure in git
@@ -50,14 +50,10 @@ docker compose config -q          # Check config with quiet output (errors only)
 ## Adding a New Service
 
 1. **Create service directory:** `mkdir -p compose/<service-name>`
-2. **Create compose.yml file:** `touch compose/<service-name>/compose.yml`
+2. **Create docker-compose.yaml file:** `touch compose/<service-name>/docker-compose.yaml`
 3. **Create data directory:** `mkdir -p data/<service-name> && touch data/<service-name>/.gitkeep`
-4. **Include in main docker-compose.yaml:**
-   ```yaml
-   include:
-     - compose/<service-name>/compose.yml
-   ```
-5. **Add secrets (if needed):** Store in `${SECRETS}/` directory and reference via `secrets:` directive
+4. **Add secrets (if needed):** Store in `${SECRETS}/` directory and reference via `secrets:` directive
+5. **Update README.md:** Add the service to the compose file table
 
 ## Code Style Guidelines
 
@@ -66,7 +62,7 @@ docker compose config -q          # Check config with quiet output (errors only)
 - **Indentation:** 2 spaces (no tabs)
 - **Strings:** Use single quotes for string values: `TZ: 'Europe/Amsterdam'`
 - **Comments:** Add comments to explain non-obvious configuration
-- **File naming:** Use `compose.yml` for service files (not `docker-compose.yml`)
+- **File naming:** Use `docker-compose.yaml` for service files
 
 ### Example Service Configuration
 
