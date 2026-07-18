@@ -9,7 +9,7 @@ services:
     environment:
       TZ: 'Europe/Amsterdam'
       # Unset GUI address to fall back to localhost-only default (127.0.0.1)
-      STGUIADDRESS: ''
+    STGUIADDRESS: '0.0.0.0:8384'
     volumes:
       # Syncthing configuration
       - ${MYHOMELAB}/data/syncthing/config:/var/syncthing/config
