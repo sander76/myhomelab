@@ -23,8 +23,8 @@ services:
     env_file:
       - .env
     volumes:
-      - ./qbittorrent/config:/config
-      - ./data:/data
+      - ../../qbittorrent/config:/config
+      - ../../qbittorrent/data:/data
     restart: unless-stopped
     depends_on:
       - gluetun
