@@ -45,6 +45,16 @@ docker compose logs -f
 
 ## Tailscale
 
-Each service (except Pi-hole) runs behind a Tailscale sidecar with automatic HTTPS. Create a Tailscale auth key with a tag, then set it as `TAILSCALE_AUTHKEY` in the environment or `.env` file.
+Each service (except Pi-hole) runs behind a Tailscale sidecar with automatic HTTPS. Node keys are stored in `tailscale/<service>/ts-state/`, so the auth key is only required for the **initial** authentication of each service.
 
-Node keys are stored in the `tailscale/<service>/ts-state/` folder.
+### First-time setup for a Tailscale sidecar service
+
+1. Create a [Tailscale auth key](https://tailscale.com/kb/1085/auth-keys) (reusable, tagged) in the admin console.
+2. Export it in your shell **before** running `docker compose up`:
+
+   ```bash
+   export TAILSCALE_AUTHKEY=tskey-auth-...
+   docker compose -f compose/<service>/docker-compose.yaml up -d
+   ```
+
+3. Once the sidecar is authenticated, the node state is saved in `tailscale/<service>/ts-state/`. Subsequent restarts or recreates do not need the key exported again.

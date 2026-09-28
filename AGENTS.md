@@ -139,6 +139,22 @@ remove deprecated config option
 - **Container naming:** Use `container_name: <service>`, lowercase with hyphens if needed
 - **Restart policy:** Default to `restart: unless-stopped`, use `always` for critical services
 
+## Tailscale Sidecars
+
+Several services run inside a Tailscale sidecar (`tailscale-<service>` container). These containers require a `TAILSCALE_AUTHKEY` environment variable for **initial** authentication only. After the first successful start, the Tailscale node state is persisted in `tailscale/<service>/ts-state/`.
+
+### Agent workflow when starting a new or recreated Tailscale sidecar
+
+1. Check if `tailscale/<service>/ts-state/` already contains state files. If yes, the container should come up without the key.
+2. If the sidecar is new or its state was wiped, the auth key must be exported in the shell before running `docker compose up`:
+
+   ```bash
+   export TAILSCALE_AUTHKEY=tskey-auth-...
+   docker compose -f compose/<service>/docker-compose.yaml up -d
+   ```
+
+3. Do **not** hardcode the key into compose files or commit it. It may live in the service's `.env` file or the user's shell environment, but treat it as a secret.
+
 ## Troubleshooting
 
 ```bash
